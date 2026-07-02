@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <title>Jugador · Luz roja, luz verde</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- Unirse a la partida -->
+  <section id="screen-join" class="screen active">
+    <div class="title">Luz roja, luz verde</div>
+    <div class="subtitle">Unete a la partida</div>
+    <div class="card">
+      <div class="error-msg" id="join-error"></div>
+
+      <label class="hint" for="input-code">Codigo de partida</label>
+      <input type="text" id="input-code" maxlength="5" placeholder="CODIGO" autocapitalize="characters" />
+
+      <label class="hint" for="input-username">Tu nombre</label>
+      <input type="text" id="input-username" maxlength="24" placeholder="Nombre de jugador" />
+
+      <div class="camera-wrap">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <img id="selfie-preview" style="display:none" alt="Tu selfie" />
+      </div>
+      <canvas id="camera-canvas" style="display:none"></canvas>
+
+      <div class="control-buttons" style="margin-bottom: 14px;">
+        <button id="btn-start-camera" class="btn-secondary btn-block">Activar camara</button>
+        <button id="btn-capture" class="btn-primary btn-block" disabled>Hacer selfie</button>
+      </div>
+
+      <button id="btn-join" class="btn-primary btn-block" disabled>Unirme a la partida</button>
+    </div>
+  </section>
+
+  <!-- Sala de espera -->
+  <section id="screen-waiting" class="screen">
+    <div class="title">Estas dentro</div>
+    <div class="card">
+      <div class="camera-wrap" style="width:120px;height:120px;">
+        <img id="waiting-selfie" alt="Tu selfie" />
+      </div>
+      <p class="hint">Tu numero de jugador</p>
+      <div class="game-code" id="waiting-number">000</div>
+      <p class="hint">Esperando a que el master comience la partida...</p>
+      <div class="spinner"></div>
+    </div>
+  </section>
+
+  <!-- Partida en curso: pantalla de color a pantalla completa -->
+  <section id="screen-game" class="screen player-game-screen">
+    <div class="big-number" id="game-number">000</div>
+    <div class="status-text" id="game-status-text">LUZ VERDE · MUEVETE</div>
+  </section>
+
+  <!-- Eliminado -->
+  <section id="screen-eliminated" class="screen">
+    <div class="eliminated-icon">&#10060;</div>
+    <div class="title" style="color:#ff2d2d;">Eliminado</div>
+    <p class="hint">Te has movido con la luz roja encendida.</p>
+    <div class="card">
+      <p class="hint">Numero</p>
+      <div class="game-code" id="eliminated-number">000</div>
+    </div>
+  </section>
+
+  <!-- Resultados -->
+  <section id="screen-result" class="screen">
+    <div id="result-icon" class="winner-icon">&#127942;</div>
+    <div class="title" id="result-title">HAS GANADO</div>
+    <p class="hint" id="result-subtitle"></p>
+    <ul id="result-winners" class="winners-list"></ul>
+  </section>
+
+  <p class="footer-note">Jugador · Luz roja, luz verde</p>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/player.js"></script>
+</body>
+</html>

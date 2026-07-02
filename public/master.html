@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Master · Luz roja, luz verde</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- Pantalla inicial: crear partida -->
+  <section id="screen-create" class="screen active">
+    <div class="title">Luz roja, luz verde</div>
+    <div class="subtitle">Panel del master</div>
+    <div class="card">
+      <p class="hint">Pulsa el boton para abrir una partida nueva. Se generara un codigo QR para que los jugadores se unan desde su movil.</p>
+      <button id="btn-create" class="btn-primary btn-block">Crear partida</button>
+    </div>
+  </section>
+
+  <!-- Lobby: QR + lista de jugadores -->
+  <section id="screen-lobby" class="screen">
+    <div class="title">Sala de espera</div>
+    <div class="game-code" id="lobby-code">-----</div>
+    <div class="qr-wrap"><img id="qr-image" alt="Codigo QR para unirse" /></div>
+    <p class="hint">Los jugadores escanean el QR o entran el codigo en su movil.</p>
+    <div class="card">
+      <span class="count-pill"><span id="player-count">0</span> jugadores conectados</span>
+      <ul id="lobby-player-list" class="player-list"></ul>
+    </div>
+    <div class="control-buttons" style="margin-top:18px;">
+      <button id="btn-cancel" class="btn-secondary">Cancelar</button>
+      <button id="btn-start" class="btn-primary" disabled>Comenzar partida</button>
+    </div>
+  </section>
+
+  <!-- Partida en curso -->
+  <section id="screen-game" class="screen">
+    <div class="title">Partida <span id="game-code-tag"></span></div>
+    <div id="light-banner" class="light-banner green">LUZ VERDE</div>
+    <div class="control-buttons">
+      <button id="btn-red" class="btn-danger">Luz roja</button>
+      <button id="btn-green" class="btn-primary">Luz verde</button>
+    </div>
+    <div class="card">
+      <span class="count-pill"><span id="active-count">0</span> / <span id="total-count">0</span> en juego</span>
+      <ul id="game-player-list" class="player-list"></ul>
+    </div>
+    <button id="btn-end" class="btn-secondary" style="margin-top:18px;">Finalizar partida</button>
+  </section>
+
+  <!-- Resultados -->
+  <section id="screen-results" class="screen">
+    <div class="title">Fin de la partida</div>
+    <div class="subtitle" id="results-subtitle">Jugadores que han ganado</div>
+    <ul id="winners-list" class="winners-list"></ul>
+    <button id="btn-new-game" class="btn-primary btn-block">Nueva partida</button>
+  </section>
+
+  <p class="footer-note">Master · Luz roja, luz verde</p>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/master.js"></script>
+</body>
+</html>
