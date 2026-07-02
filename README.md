@@ -30,3 +30,20 @@ npm start
 ```
 
 El servidor arranca en `http://localhost:3000` (variable `PORT` configurable). Para probarlo con moviles reales en una fiesta, despliega detras de HTTPS (por ejemplo con un tunel como ngrok, o un hosting con TLS) ya que los sensores y la camara requieren un contexto seguro.
+
+## Despliegue en Render
+
+El repo incluye `render.yaml` listo para un despliegue "Blueprint":
+
+1. Entra en [render.com](https://render.com) y crea una cuenta (puedes hacerlo con tu cuenta de GitHub).
+2. Pulsa **New +** → **Blueprint**.
+3. Conecta tu cuenta de GitHub y selecciona el repositorio `obgiraldez/Calamar`.
+4. Render detectara el `render.yaml` y propondra crear el servicio `calamar-luz-roja-luz-verde` (plan Free, region Frankfurt). Confirma con **Apply**.
+5. Espera a que termine el build (`npm install`) y el deploy. Render te da una URL del tipo `https://calamar-luz-roja-luz-verde.onrender.com` con HTTPS ya incluido.
+6. Abre esa URL + `/master.html` en el ordenador/proyector de la fiesta, y comparte el codigo QR para que los jugadores entren desde `/player.html` en sus moviles.
+
+Notas del plan Free de Render:
+- El servicio "duerme" tras ~15 min sin trafico y tarda unos segundos en despertar con la siguiente visita. Antes de la fiesta, abre la URL un par de minutos antes para "despertarlo".
+- Al no tener base de datos, si el servicio se reinicia se pierden las partidas en curso (no afecta al uso normal, solo evita reinicios manuales durante una partida activa).
+- Si quieres evitar el "sleep", puedes cambiar `plan: free` por `plan: starter` en `render.yaml` (de pago) antes de desplegar.
+

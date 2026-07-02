@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: calamar-luz-roja-luz-verde
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /
