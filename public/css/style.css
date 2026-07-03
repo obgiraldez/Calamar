@@ -243,12 +243,48 @@ input[type='text']:focus {
   transition: background-color 0.25s ease;
 }
 
-#master-screen-game.state-green {
-  background: radial-gradient(circle at 50% 0%, #0f6b30, var(--bg-dark) 75%);
-}
-
 #master-screen-game.state-red {
   background: radial-gradient(circle at 50% 0%, #7a1414, var(--bg-dark) 75%);
+}
+
+/* Luz verde: degradado conico que gira sin parar entre dos verdes, para dar
+   sensacion de movimiento en el proyector en vez de un simple color plano.
+   Se anima el propio angulo del gradiente (Houdini @property) en vez de
+   rotar un elemento enorme: es mas ligero y evita huecos en los bordes. */
+@property --spin-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+#master-screen-game.state-green {
+  background: #0a3d1f;
+}
+
+#master-screen-game.state-green::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: conic-gradient(
+    from var(--spin-angle) at 50% 50%,
+    #0a3d1f 0%,
+    #1fbf5c 25%,
+    #0a3d1f 50%,
+    #1fbf5c 75%,
+    #0a3d1f 100%
+  );
+  animation: spin-green-bg 9s linear infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes spin-green-bg {
+  from {
+    --spin-angle: 0deg;
+  }
+  to {
+    --spin-angle: 360deg;
+  }
 }
 
 .light-label {
