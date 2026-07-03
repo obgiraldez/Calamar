@@ -8,8 +8,26 @@
 </head>
 <body>
 
+  <!-- Aviso de privacidad -->
+  <section id="screen-consent" class="screen active">
+    <div class="title">Antes de continuar</div>
+    <div class="card" style="text-align:left;">
+      <p class="hint">Para jugar necesitamos que te hagas una <strong>selfie</strong> y elijas un <strong>nombre de jugador</strong>. Ten en cuenta:</p>
+      <ul class="hint" style="padding-left: 18px; line-height: 1.5;">
+        <li>Tu foto y tu nombre se veran en la pantalla del master y en cualquier pantalla o proyector conectado a ella durante toda la partida, a la vista del resto de invitados.</li>
+        <li>Solo se usan para esta partida: se borran del servidor en cuanto la partida termina. No se guardan ni se comparten con nadie mas.</li>
+        <li>Si no estas de acuerdo, no continues con el registro.</li>
+      </ul>
+      <label class="hint" style="display:flex; align-items:flex-start; gap:8px; margin: 14px 0;">
+        <input type="checkbox" id="consent-checkbox" style="width:20px;height:20px;margin-top:2px;flex-shrink:0;" />
+        <span>He leido y acepto que mi foto y mi nombre se muestren publicamente durante la partida.</span>
+      </label>
+      <button id="btn-consent-continue" class="btn-primary btn-block" disabled>Continuar</button>
+    </div>
+  </section>
+
   <!-- Unirse a la partida -->
-  <section id="screen-join" class="screen active">
+  <section id="screen-join" class="screen">
     <div class="title">Luz roja, luz verde</div>
     <div class="subtitle">Unete a la partida</div>
     <div class="card">

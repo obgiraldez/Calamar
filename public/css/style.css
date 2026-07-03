@@ -114,6 +114,12 @@ button:disabled {
   color: #fff;
 }
 
+.btn-green {
+  background: var(--green);
+  color: #06210f;
+  box-shadow: 0 6px 18px rgba(20, 227, 90, 0.35);
+}
+
 .btn-block {
   width: 100%;
 }
@@ -358,6 +364,87 @@ input[type='text']:focus {
   margin-top: 24px;
   color: var(--text-dim);
   font-size: 0.75rem;
+}
+
+/* Pantalla de partida del master: mas ancha, pensada para proyectarse */
+.screen-game-wide {
+  max-width: 100%;
+}
+
+.player-grid {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin: 16px 0 6px;
+}
+
+.grid-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+  border: 2px solid var(--panel-border);
+}
+
+.grid-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.grid-card .grid-number {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 6px 4px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  letter-spacing: 1px;
+}
+
+.grid-card.eliminated img {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.grid-eliminated-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(122, 20, 20, 0.55);
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.grid-eliminated-overlay .grid-x {
+  font-size: 2.2rem;
+}
+
+.grid-page-indicator {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 700px) {
+  .player-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 380px) {

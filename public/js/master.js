@@ -15,58 +15,6 @@
 
   let currentCode = null;
 
-  // ---------- Musica ambiente (simulada con Web Audio API) ----------
-  const music = createAmbientMusic();
-
-  function createAmbientMusic() {
-    let ctx = null;
-    let playing = false;
-    let notesTimer = null;
-    const notes = [261.6, 329.6, 392.0, 329.6, 293.7, 392.0, 440.0, 392.0];
-    let noteIndex = 0;
-
-    function ensureCtx() {
-      if (!ctx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        ctx = new AudioCtx();
-      }
-      if (ctx.state === 'suspended') ctx.resume();
-      return ctx;
-    }
-
-    function playNote(freq) {
-      const c = ensureCtx();
-      const osc = c.createOscillator();
-      const gain = c.createGain();
-      osc.type = 'square';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.0001, c.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.06, c.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.28);
-      osc.connect(gain).connect(c.destination);
-      osc.start();
-      osc.stop(c.currentTime + 0.3);
-    }
-
-    function start() {
-      if (playing) return;
-      playing = true;
-      ensureCtx();
-      notesTimer = setInterval(() => {
-        playNote(notes[noteIndex % notes.length]);
-        noteIndex += 1;
-      }, 320);
-    }
-
-    function stop() {
-      playing = false;
-      if (notesTimer) clearInterval(notesTimer);
-      notesTimer = null;
-    }
-
-    return { start, stop };
-  }
-
   // ---------- Crear partida ----------
   document.getElementById('btn-create').addEventListener('click', () => {
     socket.emit('master:createGame', {}, (res) => {
@@ -78,7 +26,6 @@
 
   async function enterLobby(code) {
     document.getElementById('lobby-code').textContent = code;
-    document.getElementById('game-code-tag').textContent = `#${code}`;
     try {
       const resp = await fetch(`/api/games/${code}/qrcode`);
       const data = await resp.json();
@@ -95,6 +42,34 @@
     currentCode = null;
     showScreen('create');
   });
+
+  // ---------- Reconexion automatica ----------
+  // Si el navegador del master pierde la conexion un instante, Socket.io
+  // reconecta con un socket nuevo: sin este paso el servidor "olvida" que
+  // este socket controlaba la partida y los botones dejan de tener efecto.
+  socket.on('connect', () => {
+    if (!currentCode) return;
+    socket.emit('master:reconnect', { code: currentCode }, (res) => {
+      if (!res || !res.ok) return;
+      applyState(res.state);
+    });
+  });
+
+  function applyState(state) {
+    if (state.status === 'ended') {
+      renderWinners(state.players.filter((p) => p.status === 'winner'));
+      showScreen('results');
+      return;
+    }
+    if (state.status === 'green' || state.status === 'red') {
+      setLightBanner(state.status);
+      renderGamePlayers(state.players);
+      showScreen('game');
+      return;
+    }
+    renderLobbyPlayers(state.players);
+    showScreen('lobby');
+  }
 
   // ---------- Lobby: lista de jugadores ----------
   function renderLobbyPlayers(players) {
@@ -138,6 +113,7 @@
   });
 
   socket.on('game:started', ({ state }) => {
+    setLightBanner('green');
     renderGamePlayers(state.players);
     showScreen('game');
   });
@@ -150,8 +126,6 @@
     banner.classList.remove('green', 'red');
     banner.classList.add(color);
     banner.textContent = color === 'green' ? 'LUZ VERDE' : 'LUZ ROJA';
-    if (color === 'green') music.start();
-    else music.stop();
   }
 
   document.getElementById('btn-red').addEventListener('click', () => {
@@ -166,32 +140,82 @@
     renderGamePlayers(state.players);
   });
 
+  // ---------- Rejilla grande de participantes (foto + numero) ----------
+  const GRID_PAGE_SIZE = 16;
+  const GRID_ROTATE_MS = 6000;
+  let gridPlayers = [];
+  let gridPageIndex = 0;
+  let gridRotateTimer = null;
+
   function renderGamePlayers(players) {
     const active = players.filter((p) => p.status === 'active').length;
     document.getElementById('active-count').textContent = active;
     document.getElementById('total-count').textContent = players.length;
-    const list = document.getElementById('game-player-list');
-    list.innerHTML = '';
-    players.forEach((p) => list.appendChild(playerListItem(p)));
+
+    gridPlayers = players;
+    const totalPages = Math.max(1, Math.ceil(gridPlayers.length / GRID_PAGE_SIZE));
+    if (gridPageIndex >= totalPages) gridPageIndex = 0;
+    drawGridPage();
+    restartGridRotation(totalPages);
+  }
+
+  function drawGridPage() {
+    const totalPages = Math.max(1, Math.ceil(gridPlayers.length / GRID_PAGE_SIZE));
+    const start = gridPageIndex * GRID_PAGE_SIZE;
+    const pagePlayers = gridPlayers.slice(start, start + GRID_PAGE_SIZE);
+    const grid = document.getElementById('player-grid');
+    grid.innerHTML = '';
+    pagePlayers.forEach((p) => grid.appendChild(gridCard(p)));
+    document.getElementById('grid-page-indicator').textContent =
+      totalPages > 1 ? `Pagina ${gridPageIndex + 1} / ${totalPages}` : '';
+  }
+
+  function gridCard(p) {
+    const div = document.createElement('div');
+    div.className = 'grid-card' + (p.status === 'eliminated' ? ' eliminated' : '');
+    const img = document.createElement('img');
+    img.src = p.selfie;
+    img.alt = p.username;
+    const number = document.createElement('div');
+    number.className = 'grid-number';
+    number.textContent = p.numberLabel;
+    div.append(img, number);
+    if (p.status === 'eliminated') {
+      const overlay = document.createElement('div');
+      overlay.className = 'grid-eliminated-overlay';
+      overlay.innerHTML = '<span class="grid-x">&#10060;</span><span>ELIMINADO</span>';
+      div.appendChild(overlay);
+    }
+    return div;
+  }
+
+  function restartGridRotation(totalPages) {
+    if (gridRotateTimer) clearInterval(gridRotateTimer);
+    gridRotateTimer = null;
+    if (totalPages <= 1) return;
+    gridRotateTimer = setInterval(() => {
+      gridPageIndex = (gridPageIndex + 1) % totalPages;
+      drawGridPage();
+    }, GRID_ROTATE_MS);
   }
 
   // ---------- Finalizar partida ----------
   document.getElementById('btn-end').addEventListener('click', () => {
     socket.emit('master:endGame', {}, (res) => {
       if (!res || !res.ok) return;
-      music.stop();
       renderWinners(res.winners);
       showScreen('results');
     });
   });
 
   socket.on('game:ended', ({ winners }) => {
-    music.stop();
     renderWinners(winners);
     showScreen('results');
   });
 
   function renderWinners(winners) {
+    if (gridRotateTimer) clearInterval(gridRotateTimer);
+    gridRotateTimer = null;
     const subtitle = document.getElementById('results-subtitle');
     subtitle.textContent =
       winners.length > 0

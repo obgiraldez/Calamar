@@ -179,9 +179,14 @@ io.on('connection', (socket) => {
         winners.push(gameManager.publicPlayer(p));
       }
     });
+    shuffle(winners);
     const state = gameManager.publicGameState(game);
     io.to(roomName(game.code)).emit('game:ended', { winners, state });
     ack && ack({ ok: true, winners, state });
+    // No necesitamos conservar fotos ni nombres una vez terminada la partida.
+    // Se deja un breve margen por si algun movil se reconecta justo al terminar.
+    const codeToDelete = game.code;
+    setTimeout(() => gameManager.deleteGame(codeToDelete), GAME_DATA_RETENTION_MS);
   });
 
   socket.on('master:closeGame', () => {
@@ -212,6 +217,13 @@ io.on('connection', (socket) => {
       if (game && game.masterSocketId === socket.id) {
         // El master se puede reconectar mientras la partida siga viva.
         game.masterSocketId = null;
+        const codeAtDisconnect = currentGameCode;
+        setTimeout(() => {
+          const abandoned = gameManager.getGame(codeAtDisconnect);
+          if (abandoned && abandoned.masterSocketId === null) {
+            gameManager.deleteGame(codeAtDisconnect);
+          }
+        }, MASTER_ABANDON_TIMEOUT_MS);
       }
     }
   });
@@ -229,6 +241,17 @@ function roomName(code) {
 function masterRoomName(code) {
   return `game:${code}:master`;
 }
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+const MASTER_ABANDON_TIMEOUT_MS = 2 * 60 * 1000;
+const GAME_DATA_RETENTION_MS = 30 * 1000;
 
 server.listen(PORT, () => {
   console.log(`Servidor "Luz roja, luz verde" escuchando en el puerto ${PORT}`);

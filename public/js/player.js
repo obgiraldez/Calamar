@@ -2,6 +2,7 @@
   const socket = io();
 
   const screens = {
+    consent: document.getElementById('screen-consent'),
     join: document.getElementById('screen-join'),
     waiting: document.getElementById('screen-waiting'),
     game: document.getElementById('screen-game'),
@@ -22,7 +23,20 @@
     status: 'active',
     lightIsRed: false,
     eliminationSent: false,
+    hasJoined: false,
   };
+
+  // ---------- Aviso de privacidad ----------
+  const consentCheckbox = document.getElementById('consent-checkbox');
+  const btnConsentContinue = document.getElementById('btn-consent-continue');
+
+  consentCheckbox.addEventListener('change', () => {
+    btnConsentContinue.disabled = !consentCheckbox.checked;
+  });
+
+  btnConsentContinue.addEventListener('click', () => {
+    showScreen('join');
+  });
 
   // ---------- Prefill del codigo desde la URL (?code=XXXXX) ----------
   const urlParams = new URLSearchParams(window.location.search);
@@ -122,11 +136,57 @@
       }
       state.code = code;
       state.playerId = res.player.id;
+      state.hasJoined = true;
       document.getElementById('waiting-selfie').src = res.player.selfie;
       document.getElementById('waiting-number').textContent = res.player.numberLabel;
       showScreen('waiting');
     });
   });
+
+  // ---------- Reconexion automatica ----------
+  // Si el movil pierde la cobertura un instante (muy habitual en una fiesta con
+  // muchos moviles en la misma wifi), Socket.io reconecta con un socket nuevo.
+  // Sin este paso el jugador se queda "sordo": sigue viendo la ultima pantalla
+  // pero no vuelve a recibir cambios de luz ni el final de la partida.
+  socket.on('connect', () => {
+    if (!state.hasJoined || !state.code || !state.playerId) return;
+    socket.emit('player:rejoin', { code: state.code, playerId: state.playerId }, (res) => {
+      if (!res || !res.ok) {
+        joinError.textContent = 'Se perdio la conexion con la partida.';
+        state.hasJoined = false;
+        showScreen('join');
+        return;
+      }
+      applyGameState(res.state, res.player);
+    });
+  });
+
+  function applyGameState(gameState, player) {
+    if (player.status === 'eliminated') {
+      state.status = 'eliminated';
+      document.getElementById('eliminated-number').textContent = player.numberLabel;
+      showScreen('eliminated');
+      return;
+    }
+
+    if (gameState.status === 'ended') {
+      const winners = gameState.players.filter((p) => p.status === 'winner');
+      renderResult(player.status === 'winner', winners);
+      return;
+    }
+
+    if (gameState.status === 'green' || gameState.status === 'red') {
+      document.getElementById('game-number').textContent = player.numberLabel;
+      setGameLight(gameState.status === 'red' ? 'red' : 'green');
+      showScreen('game');
+      return;
+    }
+
+    // gameState.status === 'lobby'
+    document.getElementById('waiting-selfie').src = player.selfie;
+    document.getElementById('waiting-number').textContent = player.numberLabel;
+    showScreen('waiting');
+  }
 
   // ---------- Eventos de partida ----------
   socket.on('game:started', () => {
@@ -170,6 +230,7 @@
   });
 
   socket.on('game:closed', () => {
+    state.hasJoined = false;
     joinError.textContent = 'El master ha cerrado la partida.';
     showScreen('join');
   });
