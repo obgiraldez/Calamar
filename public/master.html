@@ -35,7 +35,7 @@
   </section>
 
   <!-- Partida en curso -->
-  <section id="screen-game" class="screen screen-game-wide state-green">
+  <section id="master-screen-game" class="screen screen-game-wide state-green">
     <div id="light-label" class="light-label">LUZ VERDE</div>
     <span class="count-pill"><span id="active-count">0</span> / <span id="total-count">0</span> en juego</span>
     <div id="player-grid" class="diamond-grid"></div>
@@ -47,10 +47,10 @@
   </section>
 
   <!-- Resultados -->
-  <section id="screen-results" class="screen">
+  <section id="screen-results" class="screen screen-game-wide">
     <div class="title">Fin de la partida</div>
     <div class="subtitle" id="results-subtitle">Jugadores que han ganado</div>
-    <ul id="winners-list" class="winners-list"></ul>
+    <div id="winners-grid" class="diamond-grid"></div>
     <button id="btn-new-game" class="btn-primary btn-block">Nueva partida</button>
   </section>
 

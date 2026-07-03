@@ -4,7 +4,7 @@
   const screens = {
     create: document.getElementById('screen-create'),
     lobby: document.getElementById('screen-lobby'),
-    game: document.getElementById('screen-game'),
+    game: document.getElementById('master-screen-game'),
     results: document.getElementById('screen-results'),
   };
 
@@ -152,6 +152,7 @@
   const DIAMOND_GAP_PX = 10;
 
   let lastRenderedPlayers = [];
+  let lastWinners = [];
 
   function renderGamePlayers(players) {
     const active = players.filter((p) => p.status === 'active').length;
@@ -159,11 +160,11 @@
     document.getElementById('total-count').textContent = players.length;
 
     lastRenderedPlayers = players;
-    drawDiamondGrid(players);
+    drawDiamondGrid('player-grid', players);
   }
 
-  function drawDiamondGrid(players) {
-    const container = document.getElementById('player-grid');
+  function drawDiamondGrid(containerId, players) {
+    const container = document.getElementById(containerId);
 
     if (players.length === 0) {
       container.innerHTML = '';
@@ -224,9 +225,14 @@
 
   let resizeTimer = null;
   window.addEventListener('resize', () => {
-    if (!screens.game.classList.contains('active')) return;
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => drawDiamondGrid(lastRenderedPlayers), 150);
+    resizeTimer = setTimeout(() => {
+      if (screens.game.classList.contains('active')) {
+        drawDiamondGrid('player-grid', lastRenderedPlayers);
+      } else if (screens.results.classList.contains('active')) {
+        drawDiamondGrid('winners-grid', lastWinners);
+      }
+    }, 150);
   });
 
   // ---------- Finalizar partida ----------
@@ -244,14 +250,13 @@
   });
 
   function renderWinners(winners) {
+    lastWinners = winners;
     const subtitle = document.getElementById('results-subtitle');
     subtitle.textContent =
       winners.length > 0
         ? `${winners.length} jugador${winners.length === 1 ? '' : 'es'} han ganado`
         : 'No ha quedado ningun jugador en pie';
-    const list = document.getElementById('winners-list');
-    list.innerHTML = '';
-    winners.forEach((p) => list.appendChild(playerListItem(p)));
+    drawDiamondGrid('winners-grid', winners);
   }
 
   document.getElementById('btn-new-game').addEventListener('click', () => {
