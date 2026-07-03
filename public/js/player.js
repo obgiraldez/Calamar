@@ -63,7 +63,9 @@
   usernameInput.addEventListener('input', updateJoinButtonState);
 
   // ---------- Camara / selfie ----------
-  btnStartCamera.addEventListener('click', async () => {
+  const btnRetake = document.getElementById('btn-retake');
+
+  async function startCamera() {
     joinError.textContent = '';
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -72,12 +74,18 @@
       });
       state.stream = stream;
       video.srcObject = stream;
+      video.style.display = 'block';
+      selfiePreview.style.display = 'none';
+      btnCapture.style.display = '';
       btnCapture.disabled = false;
-      btnStartCamera.disabled = true;
+      btnStartCamera.style.display = 'none';
+      btnRetake.style.display = 'none';
     } catch (err) {
       joinError.textContent = 'No se pudo acceder a la camara. Revisa los permisos del navegador.';
     }
-  });
+  }
+
+  btnStartCamera.addEventListener('click', startCamera);
 
   btnCapture.addEventListener('click', () => {
     const w = video.videoWidth || 480;
@@ -95,7 +103,18 @@
     selfiePreview.style.display = 'block';
     video.style.display = 'none';
     stopCameraStream();
+    // El video ya no tiene stream: hay que reactivar la camara para poder
+    // repetir la foto en lugar de volver a pulsar "Hacer selfie" (que
+    // dibujaria un fotograma congelado en negro).
+    btnCapture.style.display = 'none';
+    btnRetake.style.display = '';
     updateJoinButtonState();
+  });
+
+  btnRetake.addEventListener('click', () => {
+    state.selfie = null;
+    updateJoinButtonState();
+    startCamera();
   });
 
   function stopCameraStream() {

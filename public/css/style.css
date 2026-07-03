@@ -237,29 +237,36 @@ input[type='text']:focus {
   margin-bottom: 12px;
 }
 
-.light-banner {
-  width: 100%;
-  max-width: 480px;
-  padding: 20px;
-  border-radius: 16px;
-  font-size: 1.8rem;
-  font-weight: 900;
+/* El fondo de toda la pantalla del master indica la luz, en vez de un
+   badge/icono independiente: es mucho mas visible para el proyector. */
+#screen-game {
+  transition: background-color 0.25s ease;
+}
+
+#screen-game.state-green {
+  background: radial-gradient(circle at 50% 0%, #0f6b30, var(--bg-dark) 75%);
+}
+
+#screen-game.state-red {
+  background: radial-gradient(circle at 50% 0%, #7a1414, var(--bg-dark) 75%);
+}
+
+.light-label {
+  font-weight: 800;
   letter-spacing: 3px;
   text-transform: uppercase;
-  margin-bottom: 20px;
-  transition: background 0.2s ease;
+  font-size: 0.95rem;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  margin-bottom: 10px;
 }
 
-.light-banner.green {
-  background: linear-gradient(135deg, #0a3d1f, #0f6b30);
+#screen-game.state-green .light-label {
   color: var(--green);
-  box-shadow: 0 0 30px rgba(20, 227, 90, 0.35);
 }
 
-.light-banner.red {
-  background: linear-gradient(135deg, #4a0d0d, #7a1414);
+#screen-game.state-red .light-label {
   color: var(--red);
-  box-shadow: 0 0 30px rgba(255, 45, 45, 0.35);
 }
 
 .control-buttons {
@@ -371,88 +378,90 @@ input[type='text']:focus {
   max-width: 100%;
 }
 
-.player-grid {
+/* Rejilla de rombos entrelazados (estilo "El juego del calamar"): filas
+   centradas que alternan N / N-1 tarjetas, lo que las desplaza media
+   tarjeta y crea el efecto panal al superponerlas verticalmente. */
+.diamond-grid {
   width: 100%;
-  max-width: 1100px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin: 16px 0 6px;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0 6px;
 }
 
-.grid-card {
+.diamond-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--diamond-gap, 10px);
+}
+
+.diamond-row-overlap {
+  margin-top: calc(var(--diamond-size, 90px) * -0.44);
+}
+
+.diamond-card {
   position: relative;
-  aspect-ratio: 1 / 1;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #000;
-  border: 2px solid var(--panel-border);
+  flex: 0 0 auto;
+  width: var(--diamond-size, 90px);
+  aspect-ratio: 0.82 / 1;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: #050608;
+  border: 2px solid rgba(255, 45, 120, 0.55);
 }
 
-.grid-card img {
+.diamond-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.grid-card .grid-number {
+.diamond-card .diamond-number {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
-  padding: 6px 4px;
+  bottom: 14%;
   text-align: center;
-  font-weight: 800;
-  font-size: 1.1rem;
+  font-weight: 900;
+  font-size: calc(var(--diamond-size, 90px) * 0.16);
   color: #fff;
-  background: rgba(0, 0, 0, 0.55);
-  letter-spacing: 1px;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.9), 0 0 3px #000;
+  letter-spacing: 0.5px;
 }
 
-.grid-card.eliminated img {
+.diamond-card.eliminated {
+  border-color: rgba(255, 45, 45, 0.7);
+}
+
+.diamond-card.eliminated img {
   filter: grayscale(1);
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
-.grid-eliminated-overlay {
+.diamond-eliminated-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  background: rgba(122, 20, 20, 0.55);
+  gap: 2px;
+  background: rgba(122, 20, 20, 0.6);
   color: #fff;
   font-weight: 900;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
+  font-size: calc(var(--diamond-size, 90px) * 0.1);
+  letter-spacing: 0.5px;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
-.grid-eliminated-overlay .grid-x {
-  font-size: 2.2rem;
-}
-
-.grid-page-indicator {
-  color: var(--text-dim);
-  font-size: 0.85rem;
-  margin-bottom: 12px;
-}
-
-@media (max-width: 700px) {
-  .player-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.diamond-eliminated-overlay .diamond-x {
+  font-size: calc(var(--diamond-size, 90px) * 0.26);
 }
 
 @media (max-width: 380px) {
   .game-code {
     font-size: 2.1rem;
     letter-spacing: 5px;
-  }
-  .light-banner {
-    font-size: 1.4rem;
   }
 }

@@ -62,7 +62,7 @@
       return;
     }
     if (state.status === 'green' || state.status === 'red') {
-      setLightBanner(state.status);
+      setLightState(state.status);
       renderGamePlayers(state.players);
       showScreen('game');
       return;
@@ -113,19 +113,19 @@
   });
 
   socket.on('game:started', ({ state }) => {
-    setLightBanner('green');
+    setLightState('green');
     renderGamePlayers(state.players);
     showScreen('game');
   });
 
-  socket.on('game:greenLight', () => setLightBanner('green'));
-  socket.on('game:redLight', () => setLightBanner('red'));
+  socket.on('game:greenLight', () => setLightState('green'));
+  socket.on('game:redLight', () => setLightState('red'));
 
-  function setLightBanner(color) {
-    const banner = document.getElementById('light-banner');
-    banner.classList.remove('green', 'red');
-    banner.classList.add(color);
-    banner.textContent = color === 'green' ? 'LUZ VERDE' : 'LUZ ROJA';
+  function setLightState(color) {
+    const gameScreen = screens.game;
+    gameScreen.classList.remove('state-green', 'state-red');
+    gameScreen.classList.add(color === 'red' ? 'state-red' : 'state-green');
+    document.getElementById('light-label').textContent = color === 'red' ? 'LUZ ROJA' : 'LUZ VERDE';
   }
 
   document.getElementById('btn-red').addEventListener('click', () => {
@@ -140,64 +140,94 @@
     renderGamePlayers(state.players);
   });
 
-  // ---------- Rejilla grande de participantes (foto + numero) ----------
-  const GRID_PAGE_SIZE = 16;
-  const GRID_ROTATE_MS = 6000;
-  let gridPlayers = [];
-  let gridPageIndex = 0;
-  let gridRotateTimer = null;
+  // ---------- Rejilla en rombo de participantes (foto + numero) ----------
+  // Filas centradas que alternan "cols" y "cols - 1" tarjetas: al estar
+  // ambas centradas, la fila corta queda automaticamente desplazada media
+  // tarjeta respecto a la larga, y una superposicion vertical negativa
+  // entrelaza las filas como un panal de rombos (ver el cartel original
+  // de "El juego del calamar"). No hay paginacion: la tarjeta se encoge o
+  // crece segun quepan mas o menos jugadores y segun el ancho disponible.
+  const MIN_DIAMOND_PX = 46;
+  const MAX_DIAMOND_PX = 150;
+  const DIAMOND_GAP_PX = 10;
+
+  let lastRenderedPlayers = [];
 
   function renderGamePlayers(players) {
     const active = players.filter((p) => p.status === 'active').length;
     document.getElementById('active-count').textContent = active;
     document.getElementById('total-count').textContent = players.length;
 
-    gridPlayers = players;
-    const totalPages = Math.max(1, Math.ceil(gridPlayers.length / GRID_PAGE_SIZE));
-    if (gridPageIndex >= totalPages) gridPageIndex = 0;
-    drawGridPage();
-    restartGridRotation(totalPages);
+    lastRenderedPlayers = players;
+    drawDiamondGrid(players);
   }
 
-  function drawGridPage() {
-    const totalPages = Math.max(1, Math.ceil(gridPlayers.length / GRID_PAGE_SIZE));
-    const start = gridPageIndex * GRID_PAGE_SIZE;
-    const pagePlayers = gridPlayers.slice(start, start + GRID_PAGE_SIZE);
-    const grid = document.getElementById('player-grid');
-    grid.innerHTML = '';
-    pagePlayers.forEach((p) => grid.appendChild(gridCard(p)));
-    document.getElementById('grid-page-indicator').textContent =
-      totalPages > 1 ? `Pagina ${gridPageIndex + 1} / ${totalPages}` : '';
+  function drawDiamondGrid(players) {
+    const container = document.getElementById('player-grid');
+
+    if (players.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    const containerWidth = container.clientWidth || container.parentElement.clientWidth || 320;
+
+    // Numero de columnas de las filas "largas": buscamos una rejilla mas o
+    // menos cuadrada, para que quepan todos sin que queden filas eternas.
+    let cols = Math.round(Math.sqrt(players.length * 1.15));
+    cols = Math.max(3, Math.min(10, cols));
+
+    let diamondSize = (containerWidth - DIAMOND_GAP_PX * (cols - 1)) / cols;
+    diamondSize = Math.max(MIN_DIAMOND_PX, Math.min(MAX_DIAMOND_PX, diamondSize));
+
+    container.style.setProperty('--diamond-size', `${diamondSize}px`);
+    container.style.setProperty('--diamond-gap', `${DIAMOND_GAP_PX}px`);
+    container.innerHTML = '';
+
+    let index = 0;
+    let rowIsLong = true;
+    let rowIndex = 0;
+    while (index < players.length) {
+      const rowSize = rowIsLong ? cols : Math.max(1, cols - 1);
+      const rowPlayers = players.slice(index, index + rowSize);
+      if (rowPlayers.length === 0) break;
+
+      const row = document.createElement('div');
+      row.className = 'diamond-row' + (rowIndex > 0 ? ' diamond-row-overlap' : '');
+      rowPlayers.forEach((p) => row.appendChild(diamondCard(p)));
+      container.appendChild(row);
+
+      index += rowSize;
+      rowIsLong = !rowIsLong;
+      rowIndex += 1;
+    }
   }
 
-  function gridCard(p) {
+  function diamondCard(p) {
     const div = document.createElement('div');
-    div.className = 'grid-card' + (p.status === 'eliminated' ? ' eliminated' : '');
+    div.className = 'diamond-card' + (p.status === 'eliminated' ? ' eliminated' : '');
     const img = document.createElement('img');
     img.src = p.selfie;
     img.alt = p.username;
     const number = document.createElement('div');
-    number.className = 'grid-number';
+    number.className = 'diamond-number';
     number.textContent = p.numberLabel;
     div.append(img, number);
     if (p.status === 'eliminated') {
       const overlay = document.createElement('div');
-      overlay.className = 'grid-eliminated-overlay';
-      overlay.innerHTML = '<span class="grid-x">&#10060;</span><span>ELIMINADO</span>';
+      overlay.className = 'diamond-eliminated-overlay';
+      overlay.innerHTML = '<span class="diamond-x">&#10060;</span><span>ELIMINADO</span>';
       div.appendChild(overlay);
     }
     return div;
   }
 
-  function restartGridRotation(totalPages) {
-    if (gridRotateTimer) clearInterval(gridRotateTimer);
-    gridRotateTimer = null;
-    if (totalPages <= 1) return;
-    gridRotateTimer = setInterval(() => {
-      gridPageIndex = (gridPageIndex + 1) % totalPages;
-      drawGridPage();
-    }, GRID_ROTATE_MS);
-  }
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    if (!screens.game.classList.contains('active')) return;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => drawDiamondGrid(lastRenderedPlayers), 150);
+  });
 
   // ---------- Finalizar partida ----------
   document.getElementById('btn-end').addEventListener('click', () => {
@@ -214,8 +244,6 @@
   });
 
   function renderWinners(winners) {
-    if (gridRotateTimer) clearInterval(gridRotateTimer);
-    gridRotateTimer = null;
     const subtitle = document.getElementById('results-subtitle');
     subtitle.textContent =
       winners.length > 0
