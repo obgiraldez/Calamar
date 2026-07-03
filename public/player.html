@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-  <title>Jugador · Luz roja, luz verde</title>
+  <title>Jugador · Red light, Green light</title>
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
@@ -28,7 +28,7 @@
 
   <!-- Unirse a la partida -->
   <section id="screen-join" class="screen">
-    <div class="title">Luz roja, luz verde</div>
+    <div class="title">Red light, Green light</div>
     <div class="subtitle">Unete a la partida</div>
     <div class="card">
       <div class="error-msg" id="join-error"></div>
@@ -72,14 +72,14 @@
   <!-- Partida en curso: pantalla de color a pantalla completa -->
   <section id="screen-game" class="screen player-game-screen">
     <div class="big-number" id="game-number">000</div>
-    <div class="status-text" id="game-status-text">LUZ VERDE · MUEVETE</div>
+    <div class="status-text" id="game-status-text">GREEN LIGHT · MUEVETE</div>
   </section>
 
   <!-- Eliminado -->
   <section id="screen-eliminated" class="screen">
     <div class="eliminated-icon">&#10060;</div>
     <div class="title" style="color:#ff2d2d;">Eliminado</div>
-    <p class="hint">Te has movido con la luz roja encendida.</p>
+    <p class="hint">Te has movido con la red light encendida.</p>
     <div class="card">
       <p class="hint">Numero</p>
       <div class="game-code" id="eliminated-number">000</div>
@@ -94,7 +94,7 @@
     <ul id="result-winners" class="winners-list"></ul>
   </section>
 
-  <p class="footer-note">Jugador · Luz roja, luz verde</p>
+  <p class="footer-note">Jugador · Red light, Green light</p>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/player.js"></script>

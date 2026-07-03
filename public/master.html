@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Master · Luz roja, luz verde</title>
+  <title>Master · Red light, Green light</title>
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
 
   <!-- Pantalla inicial: crear partida -->
   <section id="screen-create" class="screen active">
-    <div class="title">Luz roja, luz verde</div>
+    <div class="title">Red light, Green light</div>
     <div class="subtitle">Panel del master</div>
     <div class="card">
       <p class="hint">Pulsa el boton para abrir una partida nueva. Se generara un codigo QR para que los jugadores se unan desde su movil.</p>
@@ -36,12 +36,12 @@
 
   <!-- Partida en curso -->
   <section id="master-screen-game" class="screen screen-game-wide state-green">
-    <div id="light-label" class="light-label">LUZ VERDE</div>
+    <div id="light-label" class="light-label">GREEN LIGHT</div>
     <span class="count-pill"><span id="active-count">0</span> / <span id="total-count">0</span> en juego</span>
     <div id="player-grid" class="diamond-grid"></div>
     <div class="control-buttons">
-      <button id="btn-red" class="btn-danger">Luz roja</button>
-      <button id="btn-green" class="btn-green">Luz verde</button>
+      <button id="btn-red" class="btn-danger">Red light</button>
+      <button id="btn-green" class="btn-green">Green light</button>
     </div>
     <button id="btn-end" class="btn-secondary" style="margin-top:12px;">Finalizar partida</button>
   </section>
@@ -54,7 +54,7 @@
     <button id="btn-new-game" class="btn-primary btn-block">Nueva partida</button>
   </section>
 
-  <p class="footer-note">Master · Luz roja, luz verde</p>
+  <p class="footer-note">Master · Red light, Green light</p>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/master.js"></script>

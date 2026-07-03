@@ -1,4 +1,4 @@
-# Luz roja, luz verde 🦑
+# Red light, Green light 🦑
 
 Juego para fiestas inspirado en "El juego del calamar" (Red Light, Green Light). Un **master** controla la partida desde el ordenador/proyector y los **jugadores** se unen desde su propio movil.
 
@@ -7,8 +7,8 @@ Juego para fiestas inspirado en "El juego del calamar" (Red Light, Green Light).
 1. El master abre `/master.html`, pulsa **Crear partida** y se muestra un codigo QR + un codigo de partida.
 2. Los jugadores escanean el QR (o entran el codigo a mano en `/player.html`), activan la camara, se hacen una selfie y eligen un nombre para unirse. Al entrar reciben un numero unico aleatorio (000-999).
 3. El master pulsa **Comenzar partida**: la pantalla de cada jugador se pone verde y pueden moverse.
-4. El master pulsa **Luz roja**: la pantalla de todos se pone roja. Si el sensor de movimiento (acelerometro) del movil de un jugador detecta que se ha movido, ese jugador queda **eliminado** automaticamente.
-5. El master alterna entre **Luz roja** / **Luz verde** hasta pulsar **Finalizar partida**, momento en el que se muestra la lista de jugadores que han sobrevivido (ganadores) tanto en la pantalla del master como en la de cada jugador.
+4. El master pulsa **Red light**: la pantalla de todos se pone roja. Si el sensor de movimiento (acelerometro) del movil de un jugador detecta que se ha movido, ese jugador queda **eliminado** automaticamente.
+5. El master alterna entre **Red light** / **Green light** hasta pulsar **Finalizar partida**, momento en el que se muestra la lista de jugadores que han sobrevivido (ganadores) tanto en la pantalla del master como en la de cada jugador.
 
 ## Requisitos tecnicos del movil del jugador
 

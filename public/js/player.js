@@ -227,11 +227,11 @@
     const statusText = document.getElementById('game-status-text');
     if (color === 'red') {
       screen.classList.add('state-red');
-      statusText.textContent = 'LUZ ROJA · NO TE MUEVAS';
+      statusText.textContent = 'RED LIGHT · NO TE MUEVAS';
       resetMotionBaseline();
     } else {
       screen.classList.remove('state-red');
-      statusText.textContent = 'LUZ VERDE · MUEVETE';
+      statusText.textContent = 'GREEN LIGHT · MUEVETE';
       state.eliminationSent = false;
     }
   }

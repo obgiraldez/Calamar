@@ -254,5 +254,5 @@ const MASTER_ABANDON_TIMEOUT_MS = 2 * 60 * 1000;
 const GAME_DATA_RETENTION_MS = 30 * 1000;
 
 server.listen(PORT, () => {
-  console.log(`Servidor "Luz roja, luz verde" escuchando en el puerto ${PORT}`);
+  console.log(`Servidor "Red light, Green light" escuchando en el puerto ${PORT}`);
 });

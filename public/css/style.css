@@ -244,10 +244,10 @@ input[type='text']:focus {
 }
 
 #master-screen-game.state-red {
-  background: radial-gradient(circle at 50% 0%, #7a1414, var(--bg-dark) 75%);
+  background: var(--red);
 }
 
-/* Luz verde: degradado conico que gira sin parar entre dos verdes, para dar
+/* Green light: degradado conico que gira sin parar entre dos verdes, para dar
    sensacion de movimiento en el proyector en vez de un simple color plano.
    Se anima el propio angulo del gradiente (Houdini @property) en vez de
    rotar un elemento enorme: es mas ligero y evita huecos en los bordes. */
@@ -297,13 +297,6 @@ input[type='text']:focus {
   margin-bottom: 10px;
 }
 
-#master-screen-game.state-green .light-label {
-  color: var(--green);
-}
-
-#master-screen-game.state-red .light-label {
-  color: var(--red);
-}
 
 .control-buttons {
   display: flex;

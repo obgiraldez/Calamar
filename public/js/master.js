@@ -125,7 +125,7 @@
     const gameScreen = screens.game;
     gameScreen.classList.remove('state-green', 'state-red');
     gameScreen.classList.add(color === 'red' ? 'state-red' : 'state-green');
-    document.getElementById('light-label').textContent = color === 'red' ? 'LUZ ROJA' : 'LUZ VERDE';
+    document.getElementById('light-label').textContent = color === 'red' ? 'RED LIGHT' : 'GREEN LIGHT';
   }
 
   document.getElementById('btn-red').addEventListener('click', () => {

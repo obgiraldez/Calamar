@@ -1,7 +1,7 @@
 {
   "name": "calamar-red-light-green-light",
   "version": "1.0.0",
-  "description": "Juego 'Luz roja, luz verde' (estilo El Juego del Calamar) para fiestas, con un master y jugadores desde el movil.",
+  "description": "Juego 'Red light, Green light' (estilo El Juego del Calamar) para fiestas, con un master y jugadores desde el movil.",
   "main": "server/index.js",
   "engines": {
     "node": ">=18.0.0"
